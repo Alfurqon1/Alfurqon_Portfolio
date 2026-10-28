@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Al Furqon — UI/UX Designer</title>
+    <meta name="description"
+        content="Portfolio Al Furqon, UI/UX Designer. Designing scalable web & mobile apps across hospitality, edTech, and event tech." />
+
+    <!-- Font: Plus Jakarta Sans (teks) + Caveat (tanda tangan di CTA) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+
+    <style>
+        /* ============================================================
+       1. DESIGN TOKENS / VARIABEL GLOBAL
+       Ubah warna, radius, dan lebar konten utama di sini saja.
+       ============================================================ */
+        :root {
+            --bg: #0a1424;
+            /* warna latar utama */
+            --card: #0f1d31;
+            /* warna kartu */
+            --card-2: #101f35;
+            /* warna kartu varian terang */
+            --line: rgba(255, 255, 255, 0.09);
+            --text: #eef3fa;
+            --muted: #9aabc2;
+            --blue: #2f7bff;
+            /* warna aksen utama */
+            --blue-light: #63a4ff;
+            --radius: 16px;
+            --max: 1060px;
+            --font: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+        }
+
+        /* ============================================================
+       2. RESET & DASAR
+       ============================================================ */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 16px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        p {
+            margin: 0;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        ::selection {
+            background: rgba(47, 123, 255, 0.35);
+            color: #fff;
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--blue-light);
+            outline-offset: 4px;
+        }
+
+        .container {
+            width: min(100% - 40px, var(--max));
+            margin-inline: auto;
+        }
+
+        /* ============================================================
+       3. KOMPONEN UMUM (judul section, tombol, animasi reveal)
+       ============================================================ */
+
+        /* Garis biru kecil di atas judul section */
+        .rule {
+            display: block;
+            width: 46px;
+            height: 3px;
+            border-radius: 3px;
+            background: var(--blue);
+            margin-bottom: 18px;
+        }
+
+        .section {
+            padding: 76px 0;
+        }
+
+        .section-head {
+            max-width: 560px;
+            margin-bottom: 44px;
+        }
+
+        .section-title {
+            font-size: clamp(1.85rem, 4vw, 2.6rem);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            line-height: 1.12;
+        }
+
+        .section-lead {
+            margin-top: 14px;
+            color: var(--muted);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* Tombol pil biru (dipakai di kartu proyek & CTA) */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 22px;
+            border: 0;
+            border-radius: 999px;
+            background: var(--blue);
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(47, 123, 255, 0.28);
+            transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .btn:hover {
+            background: #4b8dff;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 26px rgba(47, 123, 255, 0.38);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Animasi muncul saat scroll (dijalankan oleh JS di bagian bawah).
+       Konten TIDAK disembunyikan secara default, jadi semua section tetap
+       tampil walaupun JavaScript diblokir / IntersectionObserver gagal. */
+        .reveal.is-visible {
+            animation: revealUp 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
+            animation-delay: var(--delay, 0s);
+        }
+
+        @keyframes revealUp {
+            from {
+                opacity: 0;
+                transform: translateY(26px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============================================================
+       4. HERO / HEADER
+       Latar berupa satu banner yang diredupkan.
+       ============================================================ */
+        .hero {
+            position: relative;
+            isolation: isolate;
+            /* Minimal 560px supaya banner tidak terlalu pendek di layar kecil */
+            min-height: clamp(560px, 88vh, 780px);
+            display: grid;
+            place-items: center;
+            padding: 110px 20px 120px;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* --- 4a. Banner hero — satu gambar hasil export Figma --- */
+        .hero__mosaic {
+            position: absolute;
+            inset: 0;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .hero__banner {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        /* OPSI HERO TERANG:
+       Kalau gambar Figma-mu background light gray dan mau hero terang,
+       ganti <header class="hero"> menjadi <header class="hero hero--light">.
+       Kalau tetap dark navy, biarkan seperti sekarang. */
+        .hero--light {
+            background: #e9e9e9;
+        }
+
+        .hero--light .hero__veil {
+            display: none;
+        }
+
+        .hero--light .hero__eyebrow,
+        .hero--light .hero__title {
+            color: #0a1424;
+            text-shadow: none;
+        }
+
+        .hero--light .hero__subtitle {
+            color: #334155;
+            text-shadow: none;
+        }
+
+        /* --- 4b. Lapisan gelap di atas kolase --- */
+        .hero__veil {
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background:
+                radial-gradient(54% 56% at 50% 43%, rgba(6, 13, 24, 0.46) 0%, rgba(6, 13, 24, 0.74) 66%, rgba(8, 16, 28, 0.84) 100%),
+                linear-gradient(180deg, rgba(9, 17, 30, 0.62) 0%, rgba(9, 17, 30, 0.06) 42%, rgba(9, 17, 30, 0.42) 82%, var(--bg) 100%);
+        }
+
+        /* --- 4c. Teks hero --- */
+        .hero__content {
+            max-width: 780px;
+            animation: heroIn 0.9s ease both;
+        }
+
+        @keyframes heroIn {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .hero__eyebrow {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            color: #cfddf0;
+        }
+
+        .hero__title {
+            margin: 16px 0 18px;
+            font-size: clamp(2.6rem, 7.5vw, 4.7rem);
+            font-weight: 800;
+            letter-spacing: -0.035em;
+            line-height: 1.02;
+            text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+        }
+
+        .hero__subtitle {
+            max-width: 620px;
+            margin-inline: auto;
+            color: #ccd8e8;
+            font-size: clamp(0.9rem, 1.6vw, 1.03rem);
+            line-height: 1.65;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .hero__content {
+                animation: none;
+            }
+
+            html {
+                scroll-behavior: auto;
+            }
+
+            .reveal.is-visible {
+                animation: none;
+            }
+        }
+
+        /* ============================================================
+       4d. BRANDS — marquee ke kiri, isinya gambar logo
+       ============================================================ */
+        .brands {
+            padding: 0 0 6px;
+        }
+
+        .brands .section-head {
+            margin-bottom: 30px;
+        }
+
+        /* Area marquee + fade kiri/kanan */
+        .brands__marquee {
+            position: relative;
+            overflow: hidden;
+            padding: 10px 0 8px;
+            -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 7%, #000 93%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, #000 7%, #000 93%, transparent 100%);
+        }
+
+        /* Animasi aktif setelah JS membuat grup duplikat */
+        .brands__track {
+            display: flex;
+            width: max-content;
+            will-change: transform;
+        }
+
+        .brands__track.is-ready {
+            animation: brandsScroll 30s linear infinite;
+        }
+
+        /* Pause saat hover */
+        .brands__marquee:hover .brands__track,
+        .brands__marquee:focus-within .brands__track {
+            animation-play-state: paused;
+        }
+
+        .brands__group {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            min-width: 100vw;
+            padding: 0;
+            flex-shrink: 0;
+        }
+
+        @keyframes brandsScroll {
+            from {
+                transform: translate3d(0, 0, 0);
+            }
+
+            to {
+                transform: translate3d(-50%, 0, 0);
+            }
+        }
+
+        /* Kartu logo: mengikuti gaya kartu project (dark + outline) */
+        .brand {
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            width: clamp(220px, 20vw, 280px);
+            height: clamp(96px, 8.5vw, 116px);
+            margin: 0 clamp(12px, 2vw, 27px);
+            padding: 16px 20px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: linear-gradient(160deg, #101f34 0%, #0d1a2c 100%);
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .brand:hover {
+            transform: translateY(-3px);
+            border-color: rgba(99, 164, 255, 0.32);
+            box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
+        }
+
+        .brand__img {
+            width: 100%;
+            height: 100%;
+            max-height: clamp(56px, 5vw, 76px);
+            object-fit: contain;
+        }
+
+        /* Muncul hanya kalau gambar logo gagal dimuat */
+        .brand__fallback {
+            display: none;
+            color: var(--text);
+            font-size: 0.9rem;
+            font-weight: 700;
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        @media (max-width: 560px) {
+            .brand {
+                width: 190px;
+                height: 96px;
+                padding: 14px 18px;
+            }
+
+            .brand__img {
+                max-height: 56px;
+            }
+        }
+
+        /* Reduced motion: tampilkan statis, sembunyikan duplikat */
+        @media (prefers-reduced-motion: reduce) {
+            .brands__marquee {
+                -webkit-mask-image: none;
+                mask-image: none;
+            }
+
+            .brands__track,
+            .brands__track.is-ready {
+                animation: none;
+                width: 100%;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .brands__group {
+                flex-wrap: wrap;
+                justify-content: center;
+                min-width: 0;
+                width: 100%;
+                padding: 0;
+            }
+
+            .brands__group[aria-hidden="true"] {
+                display: none;
+            }
+        }
+
+        /* ============================================================
+       5. SELECTED PROJECT
+       ============================================================ */
+        .projects {
+            display: grid;
+            gap: 26px;
+        }
+
+        .project {
+            display: grid;
+            grid-template-columns: 0.92fr 1.08fr;
+            align-items: center;
+            gap: 8px;
+            padding: 18px;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: linear-gradient(160deg, #101f34 0%, #0d1a2c 100%);
+            transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .project:hover {
+            border-color: rgba(99, 164, 255, 0.32);
+            transform: translateY(-3px);
+            box-shadow: 0 22px 40px rgba(0, 0, 0, 0.28);
+        }
+
+        /* Gambar / mockup proyek */
+        .project__media {
+            overflow: hidden;
+            border-radius: 12px;
+            background: #e4ded4;
+            aspect-ratio: 4 / 3;
+        }
+
+        .project__media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Tampilkan bagian atas screenshot; ganti ke center center bila perlu */
+            object-position: center top;
+            transition: transform 0.6s ease;
+        }
+
+        .project:hover .project__media img {
+            transform: scale(1.035);
+        }
+
+        /* Kartu placeholder (tanpa gambar) */
+        .project--empty .project__media {
+            background: #d7d6d4;
+        }
+
+        .project__body {
+            padding: 14px 26px 14px 20px;
+        }
+
+        .project__title {
+            font-size: clamp(1.15rem, 2.3vw, 1.5rem);
+            font-weight: 700;
+            letter-spacing: -0.015em;
+            line-height: 1.25;
+        }
+
+        .project__date {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #a7b8cd;
+        }
+
+        .project__desc {
+            margin: 10px 0 20px;
+            font-size: 0.84rem;
+            line-height: 1.7;
+            color: var(--muted);
+        }
+
+        /* ============================================================
+       6. WHAT I DO
+       ============================================================ */
+        .services {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+
+        .service {
+            padding: 26px 24px 28px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--card);
+            transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+        }
+
+        .service:hover {
+            transform: translateY(-4px);
+            border-color: rgba(99, 164, 255, 0.3);
+            background: var(--card-2);
+        }
+
+        .service__icon {
+            width: 30px;
+            height: 30px;
+            color: var(--blue-light);
+            stroke-width: 1.8;
+        }
+
+        .service__title {
+            margin: 18px 0 10px;
+            font-size: 0.98rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            line-height: 1.35;
+        }
+
+        .service__desc {
+            font-size: 0.83rem;
+            line-height: 1.7;
+            color: var(--muted);
+        }
+
+        /* ============================================================
+       7. MY DESIGN PROCESS
+       ============================================================ */
+        .process {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .step {
+            position: relative;
+            padding: 22px 20px 26px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: var(--card);
+            transition: border-color 0.3s ease, background 0.3s ease;
+        }
+
+        .step:hover {
+            border-color: rgba(99, 164, 255, 0.3);
+            background: var(--card-2);
+        }
+
+        .step__num {
+            display: grid;
+            place-items: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(160deg, #4d93ff 0%, #1663e6 100%);
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            box-shadow: 0 8px 18px rgba(47, 123, 255, 0.35);
+        }
+
+        .step__title {
+            margin: 16px 0 8px;
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .step__desc {
+            font-size: 0.8rem;
+            line-height: 1.7;
+            color: var(--muted);
+        }
+
+        /* Panah biru di antara kartu proses */
+        .step__arrow {
+            position: absolute;
+            top: 46px;
+            right: -19px;
+            width: 18px;
+            height: 18px;
+            color: #3d8bff;
+            z-index: 2;
+        }
+
+        .step:last-child .step__arrow {
+            display: none;
+        }
+
+        /* ============================================================
+       8. CTA — "HAVE A PROJECT IN MIND?"
+       ============================================================ */
+        .cta {
+            padding: 24px 0 96px;
+        }
+
+        .cta__card {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+            padding: clamp(32px, 5vw, 54px);
+            border: 1px solid rgba(80, 150, 255, 0.28);
+            border-radius: 22px;
+            background:
+                radial-gradient(85% 150% at 92% 18%, rgba(47, 116, 230, 0.78) 0%, rgba(24, 74, 158, 0.45) 40%, rgba(10, 23, 40, 0) 72%),
+                linear-gradient(105deg, #0a1729 0%, #0d2039 48%, #143a78 100%);
+        }
+
+        /* Cahaya dekoratif di kanan atas */
+        .cta__card::before {
+            content: "";
+            position: absolute;
+            top: -60%;
+            right: -10%;
+            width: 55%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(120, 180, 255, 0.35) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .cta__content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .rule--light {
+            background: #8fc1ff;
+        }
+
+        .cta__title {
+            font-size: clamp(1.7rem, 3.8vw, 2.5rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+        }
+
+        .cta__text {
+            margin: 12px 0 24px;
+            color: #c8d9ee;
+            font-size: 0.93rem;
+        }
+
+        /* Kartu tanda tangan miring di sisi kanan */
+        .cta__signature {
+            position: relative;
+            z-index: 1;
+            flex: 0 0 clamp(230px, 31%, 330px);
+            display: grid;
+            place-items: center;
+            aspect-ratio: 16 / 10;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 18px;
+            background: linear-gradient(150deg, rgba(5, 14, 27, 0.72) 0%, rgba(4, 12, 24, 0.92) 100%);
+            box-shadow: 0 26px 50px rgba(0, 0, 0, 0.35);
+            transform: rotate(-8deg);
+            overflow: hidden;
+        }
+
+        /* Kilau diagonal pada kartu tanda tangan */
+        .cta__signature::after {
+            content: "";
+            position: absolute;
+            inset: -40% 55% 55% -40%;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.12), transparent 70%);
+            transform: rotate(-12deg);
+            pointer-events: none;
+        }
+
+        .cta__signature-text {
+            font-family: "Caveat", "Segoe Script", cursive;
+            font-size: clamp(2rem, 4vw, 2.7rem);
+            color: #e3eefb;
+            transform: rotate(-3deg);
+            white-space: nowrap;
+        }
+
+        /* ============================================================
+       9. RESPONSIVE
+       ============================================================ */
+        @media (max-width: 960px) {
+            .process {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .step__arrow {
+                display: none;
+            }
+        }
+
+        @media (max-width: 820px) {
+            .section {
+                padding: 72px 0;
+            }
+
+            .project {
+                grid-template-columns: 1fr;
+                gap: 6px;
+                padding: 14px;
+            }
+
+            .project__media {
+                aspect-ratio: 16 / 10;
+            }
+
+            .project__body {
+                padding: 18px 12px 14px;
+            }
+
+            .services {
+                grid-template-columns: 1fr;
+            }
+
+            .cta__card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 34px;
+            }
+
+            .cta__signature {
+                flex: none;
+                width: min(100%, 320px);
+                align-self: center;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .section {
+                padding: 60px 0;
+            }
+
+            .hero {
+                min-height: clamp(560px, 82vh, 720px);
+                padding: 90px 20px 100px;
+            }
+
+            .process {
+                grid-template-columns: 1fr;
+            }
+
+            .cta {
+                padding-bottom: 80px;
+            }
+
+            .cta__card {
+                border-radius: 18px;
+            }
+
+            .cta__signature {
+                width: 100%;
+            }
+        }
+
+        /* ============================================================
+       10. FOOTER (TAMBAHAN)
+       Semua class pakai prefix "site-footer" agar aman.
+       Ubah warna/jarak di bagian ini.
+       ============================================================ */
+        .site-footer {
+            position: relative;
+            background: linear-gradient(180deg, #0a1424 0%, #070e1a 100%);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--text);
+            font-family: var(--font);
+        }
+
+        .site-footer__inner {
+            width: min(100% - 40px, var(--max));
+            margin-inline: auto;
+            padding: 46px 0 22px;
+        }
+
+        /* --- Baris atas: nama + sosial media --- */
+        .site-footer__top {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 24px;
+            flex-wrap: wrap;
+            padding-bottom: 30px;
+        }
+
+        .site-footer__name {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            line-height: 1.15;
+        }
+
+        .site-footer__role {
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        /* --- Link sosial + icon --- */
+        .site-footer__social {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .site-footer__social a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #a7b8cd;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .site-footer__social a:hover {
+            color: var(--blue-light);
+        }
+
+        .site-footer__social a:focus-visible {
+            outline: 2px solid var(--blue-light);
+            outline-offset: 4px;
+            border-radius: 2px;
+        }
+
+        /* Ukuran icon LinkedIn & Behance (warna mengikuti link) */
+        .site-footer__icon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            fill: currentColor;
+        }
+
+        /* Garis pemisah vertikal antara LinkedIn & Behance */
+        .site-footer__divider {
+            width: 1px;
+            height: 14px;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* --- Baris bawah: copyright --- */
+        .site-footer__bottom {
+            padding-top: 18px;
+            border-top: 1px solid rgba(255, 255, 255, 0.09);
+            text-align: center;
+        }
+
+        .site-footer__copyright {
+            color: #8fa3bb;
+            font-size: 0.72rem;
+            letter-spacing: 0.01em;
+            line-height: 1.6;
+        }
+
+        /* Responsive footer */
+        @media (max-width: 600px) {
+            .site-footer__inner {
+                padding: 36px 0 20px;
+            }
+
+            .site-footer__top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+                padding-bottom: 24px;
+            }
+
+            .site-footer__social {
+                gap: 12px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .site-footer__social a {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ============================================================
+       SECTION 1 — HERO
+       Ubah nama, role, dan tagline di sini.
+       Banner hero memakai SATU gambar hasil export Figma.
+       ============================================================ -->
+    <!-- Untuk hero terang, ganti class menjadi: class="hero hero--light" -->
+    <header class="hero" id="top">
+
+        <!-- 1a. Banner hero — SATU gambar hasil export Figma
+         ============================================================
+         GANTI GAMBAR HERO DI SINI
+         - Export frame hero dari Figma (bukan cuma group collage).
+         - Simpan di folder assets/, misalnya assets/hero-banner.png
+         - Lalu ganti src di bawah dengan nama file kamu.
+         - Rasio frame disarankan lebar: 1600x900 atau 1920x1080.
+         - Kalau background di Figma light gray dan mau hero terang,
+           tambahkan class "hero--light" pada <header> di atas.
+         ============================================================ -->
+        <div class="hero__mosaic" aria-hidden="true">
+            <!-- onerror: kalau file gambar belum ada, gambar disembunyikan
+           supaya ikon broken image tidak muncul. -->
+            <img class="hero__banner" src="/assets/hero_banner.png" alt="" onerror="this.style.display='none'" />
+        </div>
+
+        <!-- 1b. Lapisan gelap agar teks tetap terbaca -->
+        <div class="hero__veil" aria-hidden="true"></div>
+
+        <!-- 1c. Konten hero -->
+        <div class="hero__content">
+            <p class="hero__eyebrow">UI/UX Designer</p>
+            <h1 class="hero__title">Hello, I’m Al Furqon</h1>
+            <p class="hero__subtitle">
+                Designing Scalable Web &amp; Mobile Apps Across Hospitality, EdTech, And Event Tech
+            </p>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- ============================================================
+         SECTION 2 — SELECTED PROJECT
+         Salin blok <article class="project"> untuk menambah proyek.
+         Ganti src gambar, judul, tanggal, deskripsi, dan link tombol.
+
+         GANTI GAMBAR PROYEK:
+         - Setiap proyek punya komentar "GANTI GAMBAR PROYEK ... DI SINI".
+         - Simpan gambar di folder assets/, lalu ganti src-nya.
+         - Rekomendasi rasio 4:3 (contoh 1200 x 900 px), format JPG/PNG/SVG.
+         ============================================================ -->
+        <section class="section" id="projects">
+            <div class="container">
+
+                <!-- Judul section -->
+                <div class="section-head reveal">
+                    <span class="rule" aria-hidden="true"></span>
+                    <h2 class="section-title">Selected Project</h2>
+                    <p class="section-lead">
+                        A collection of UI/UX projects I’ve worked on, focusing on creating
+                        user-centered solutions that make a real impact
+                    </p>
+                </div>
+
+                <div class="projects">
+
+                    <!-- Proyek 1 — Safar Friendly -->
+                    <article class="project reveal">
+                        <div class="project__media">
+                            <!-- GANTI GAMBAR PROYEK 1 DI SINI -->
+                            <img src="/assets/img_safarfriendly.png" alt="Mockup website Safar Friendly"
+                                loading="lazy" />
+                        </div>
+                        <div class="project__body">
+                            <h3 class="project__title">Safar Friendly</h3>
+                            <p class="project__date">March - November 2024</p>
+                            <p class="project__desc">
+                                A Muslim Event Ticketing Platform That Connects Attendees And Event
+                                Organizers In One Digital Ecosystem, From Ticket Purchasing To Event
+                                Management.
+                            </p>
+                            <a class="btn"
+                                href="https://www.behance.net/gallery/253866929/SAFAR-FRIENDLY-Event-Management-Platform"
+                                aria-label="View portfolio Safar Friendly">View Portfolio</a>
+                        </div>
+                    </article>
+
+                    <!-- Proyek 2 — Learning Management System -->
+                    <article class="project reveal" style="--delay: .08s">
+                        <div class="project__media">
+                            <!-- GANTI GAMBAR PROYEK 2 DI SINI -->
+                            <img src="/assets/img_lms.png" alt="Mockup Learning Management System" loading="lazy" />
+                        </div>
+                        <div class="project__body">
+                            <h3 class="project__title">Learning Management System</h3>
+                            <p class="project__date">December 2024 - May 2025</p>
+                            <p class="project__desc">
+                                An Educational Platform That Connects Teachers, Students, And Parents In
+                                One Digital Ecosystem To Support The Learning Process, From Learning
+                                Materials And Exercises To Exams And Report Card Management.
+                            </p>
+                            <a class="btn"
+                                href="https://www.behance.net/gallery/253871285/Madina-Islamic-School-Learning-Management-System"
+                                aria-label="View portfolio Learning Management System">View Portfolio</a>
+                        </div>
+                    </article>
+
+                    <!-- Proyek 3 — Hotel Management System -->
+                    <article class="project reveal" style="--delay: .16s">
+                        <div class="project__media">
+                            <!-- GANTI GAMBAR PROYEK 3 DI SINI -->
+                            <img src="/assets/img_sistemhotel.png" alt="Mockup dashboard Hotel Management System"
+                                loading="lazy" />
+                        </div>
+                        <div class="project__body">
+                            <h3 class="project__title">Hotel Management System</h3>
+                            <p class="project__date">June 2025 - December 2025</p>
+                            <p class="project__desc">
+                                A Hotel Management Platform That Helps Front Office And Housekeeping
+                                Teams Manage Hotel Operations, From Reservations And Check-Ins To Room
+                                Status, Cleaning, And Maintenance.
+                            </p>
+                            <a class="btn"
+                                href="https://www.behance.net/gallery/253873597/MIS-Sofyan-Hotel-Hotel-Management-System"
+                                aria-label="View portfolio Hotel Management System">View Portfolio</a>
+                        </div>
+                    </article>
+
+                    <!-- Proyek 4 — Placeholder (hapus jika tidak dipakai) -->
+                    <article class="project project--empty reveal" style="--delay: .24s">
+                        <!-- Proyek 4 belum punya gambar.
+                 Kalau mau pakai gambar, ganti <div> di bawah dengan:
+                 <img src="assets/nama-file-proyek-4.jpg" alt="Mockup proyek 4" loading="lazy" /> -->
+                        <div class="project__media" aria-hidden="true"></div>
+                        <div class="project__body">
+                            <h3 class="project__title">Title - Project</h3>
+                            <p class="project__date">Start Date - End Date</p>
+                            <p class="project__desc">Short Description About Project</p>
+                            <a class="btn" href="#" aria-label="View portfolio project">View Portfolio</a>
+                        </div>
+                    </article>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+         SECTION 3 — BRANDS (marquee ke kiri)
+         CUKUP EDIT 4 URL GAMBAR DI BAWAH.
+         Upload logo ke WordPress Media, lalu ganti src-nya.
+         Grup duplikat untuk animasi dibuat otomatis oleh JavaScript.
+         ============================================================ -->
+        <section class="brands" id="brands" aria-labelledby="brandsTitle">
+
+            <div class="container">
+                <div class="section-head reveal">
+                    <span class="rule" aria-hidden="true"></span>
+                    <h2 class="section-title" id="brandsTitle">Brands I’ve Designed For</h2>
+                    <p class="section-lead">
+                        A selection of brands and products I’ve helped shape through research,
+                        interface design, and scalable design systems.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Marquee brand -->
+            <div class="brands__marquee">
+                <div class="brands__track" id="brandsTrack">
+
+                    <!-- ===== CUKUP EDIT BAGIAN INI =====
+               Ganti src dengan URL logo yang sudah di-upload.
+               Mau tambah brand? Salin satu blok <div class="brand">...</div>
+               di bawah, lalu ganti src dan alt-nya. -->
+                    <div class="brands__group">
+
+                        <!-- Brand 1 — Safar Friendly -->
+                        <div class="brand">
+                            <img class="brand__img" src="/assets/logo_safarfriendly.png" alt="Safar Friendly"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                            <span class="brand__fallback">Safar Friendly</span>
+                        </div>
+
+                        <!-- Brand 2 — Madina Islamic School -->
+                        <div class="brand">
+                            <img class="brand__img" src="/assets/logo_madinasch.png" alt="Madina Islamic School"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                            <span class="brand__fallback">Madina Islamic School</span>
+                        </div>
+
+                        <!-- Brand 3 — Sofyan Hotel Cut Meutia -->
+                        <div class="brand">
+                            <img class="brand__img" src="/assets/logo_sofyanhotel.png" alt="Sofyan Hotel Cut Meutia"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                            <span class="brand__fallback">Sofyan Hotel</span>
+                        </div>
+
+                        <!-- Brand 4 — Sofyan Corp -->
+                        <div class="brand">
+                            <img class="brand__img" src="/assets/logo_sofyancorp.png" alt="Sofyan Corp"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                            <span class="brand__fallback">Sofyan Corp</span>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+         SECTION 4 — WHAT I DO
+         Tiga kartu layanan. Salin <article class="service"> bila perlu.
+         ============================================================ -->
+        <section class="section" id="services">
+            <div class="container">
+
+                <div class="section-head reveal">
+                    <span class="rule" aria-hidden="true"></span>
+                    <h2 class="section-title">What I Do</h2>
+                    <p class="section-lead">
+                        I turn ideas into intuitive and impactful digital experiences
+                        through research, design, and testing
+                    </p>
+                </div>
+
+                <div class="services">
+
+                    <!-- Layanan 1 — UX Research -->
+                    <article class="service reveal">
+                        <svg class="service__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                        <h3 class="service__title">UX Research &amp; User Flows</h3>
+                        <p class="service__desc">
+                            Understand User Needs, Analyze Behaviour, And Map Clear User Flows
+                            To Solve Real Problems
+                        </p>
+                    </article>
+
+                    <!-- Layanan 2 — UI Design -->
+                    <article class="service reveal" style="--delay: .08s">
+                        <svg class="service__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M12 19l7-7 3 3-7 7-3-3z" />
+                            <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+                            <path d="M2 2l7.586 7.586" />
+                            <circle cx="11" cy="11" r="2" />
+                        </svg>
+                        <h3 class="service__title">UI Design &amp; Prototyping</h3>
+                        <p class="service__desc">
+                            Design Clean Interfaces, Build Interactive Prototypes, And Turn
+                            Ideas Into Testable Products
+                        </p>
+                    </article>
+
+                    <!-- Layanan 3 — Usability Testing -->
+                    <article class="service reveal" style="--delay: .16s">
+                        <svg class="service__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 3v18h18" />
+                            <rect x="7" y="12" width="3" height="6" rx="1" />
+                            <rect x="12" y="8" width="3" height="10" rx="1" />
+                            <rect x="17" y="5" width="3" height="13" rx="1" />
+                        </svg>
+                        <h3 class="service__title">Usability Testing &amp; Design System</h3>
+                        <p class="service__desc">
+                            Test With Real Users, Refine The Experience, And Build Consistent
+                            Design Systems That Scale
+                        </p>
+                    </article>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+         SECTION 5 — MY DESIGN PROCESS
+         Empat langkah proses. Panah antar kartu dibuat via CSS.
+         ============================================================ -->
+        <section class="section" id="process">
+            <div class="container">
+
+                <div class="section-head reveal">
+                    <span class="rule" aria-hidden="true"></span>
+                    <h2 class="section-title">My Design Process</h2>
+                    <p class="section-lead">
+                        A simple, structured process to create better products,
+                        from research to real impact
+                    </p>
+                </div>
+
+                <div class="process">
+
+                    <!-- Langkah 01 -->
+                    <article class="step reveal">
+                        <span class="step__num">01</span>
+                        <h3 class="step__title">Discover</h3>
+                        <p class="step__desc">
+                            Understand The Problem, Users And Business Goals Through Research
+                            And Analysis
+                        </p>
+                        <svg class="step__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 12h14" />
+                            <path d="m13 6 6 6-6 6" />
+                        </svg>
+                    </article>
+
+                    <!-- Langkah 02 -->
+                    <article class="step reveal" style="--delay: .08s">
+                        <span class="step__num">02</span>
+                        <h3 class="step__title">Define</h3>
+                        <p class="step__desc">
+                            Synthesize Insights, Identify Key Problems, And Set Clear
+                            Objectives
+                        </p>
+                        <svg class="step__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 12h14" />
+                            <path d="m13 6 6 6-6 6" />
+                        </svg>
+                    </article>
+
+                    <!-- Langkah 03 -->
+                    <article class="step reveal" style="--delay: .16s">
+                        <span class="step__num">03</span>
+                        <h3 class="step__title">Design</h3>
+                        <p class="step__desc">
+                            Ideate Wireframes Or UI, And Build Interactive Prototypes
+                        </p>
+                        <svg class="step__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 12h14" />
+                            <path d="m13 6 6 6-6 6" />
+                        </svg>
+                    </article>
+
+                    <!-- Langkah 04 -->
+                    <article class="step reveal" style="--delay: .24s">
+                        <span class="step__num">04</span>
+                        <h3 class="step__title">Validate</h3>
+                        <p class="step__desc">
+                            Test With Real Users, Iterate, And Refine For The Best Experience
+                        </p>
+                    </article>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+         SECTION 6 — CTA (HAVE A PROJECT IN MIND?)
+         Ganti href tombol dengan link WhatsApp / email / form kontak.
+         ============================================================ -->
+        <section class="cta" id="contact">
+            <div class="container">
+                <div class="cta__card reveal">
+
+                    <!-- Teks & tombol CTA -->
+                    <div class="cta__content">
+                        <span class="rule rule--light" aria-hidden="true"></span>
+                        <h2 class="cta__title">Have a project in mind ?</h2>
+                        <p class="cta__text">Let’s build something meaningful together</p>
+                        <a class="btn" href="mailto:hello@alfurqon.com">Let’s Talk</a>
+                    </div>
+
+                    <!-- Tanda tangan dekoratif (bisa diganti gambar PNG/SVG) -->
+                    <div class="cta__signature" aria-hidden="true">
+                        <span class="cta__signature-text">Al Furqon</span>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ============================================================
+       SECTION 7 — FOOTER (TAMBAHAN)
+       Berisi nama, role, icon LinkedIn & Behance, dan copyright.
+       Ganti href sosial media di bagian <nav> di bawah.
+       ============================================================ -->
+    <footer class="site-footer" id="footer">
+        <div class="site-footer__inner">
+
+            <!-- Baris atas: identitas + sosial media -->
+            <div class="site-footer__top">
+
+                <!-- Identitas -->
+                <div class="site-footer__brand">
+                    <p class="site-footer__name">Al Furqon</p>
+                    <p class="site-footer__role">UI/UX Designer</p>
+                </div>
+
+                <!-- Sosial media (icon + teks)
+             Ingin icon saja? Hapus <span>LinkedIn</span> / <span>Behance</span>,
+             lalu tambahkan aria-label="LinkedIn" pada link-nya. -->
+                <nav class="site-footer__social" aria-label="Social media">
+                    <a href="https://www.linkedin.com/in/username" target="_blank" rel="noopener noreferrer">
+                        <!-- Icon LinkedIn -->
+                        <svg class="site-footer__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path
+                                d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                        </svg>
+                        <span>LinkedIn</span>
+                    </a>
+
+                    <span class="site-footer__divider" aria-hidden="true"></span>
+
+                    <a href="https://www.behance.net/username" target="_blank" rel="noopener noreferrer">
+                        <!-- Icon Behance -->
+                        <svg class="site-footer__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path
+                                d="M16.969 16.927a2.561 2.561 0 0 0 1.901.677 2.501 2.501 0 0 0 1.531-.475c.362-.235.636-.584.779-.99h2.585a5.091 5.091 0 0 1-1.9 2.896 5.292 5.292 0 0 1-3.091.88 5.839 5.839 0 0 1-2.284-.433 4.871 4.871 0 0 1-1.723-1.211 5.657 5.657 0 0 1-1.08-1.874 7.057 7.057 0 0 1-.383-2.393c-.005-.8.129-1.595.396-2.349a5.313 5.313 0 0 1 5.088-3.604 4.87 4.87 0 0 1 2.376.563c.661.362 1.231.87 1.668 1.485a6.2 6.2 0 0 1 .943 2.133c.194.821.263 1.666.205 2.508h-7.699c-.063.79.184 1.574.688 2.187ZM6.947 4.084a8.065 8.065 0 0 1 1.928.198 4.29 4.29 0 0 1 1.49.638c.418.303.748.711.958 1.182.241.579.357 1.203.341 1.83a3.506 3.506 0 0 1-.506 1.961 3.726 3.726 0 0 1-1.503 1.287 3.588 3.588 0 0 1 2.027 1.437c.464.747.697 1.615.67 2.494a4.593 4.593 0 0 1-.423 2.032 3.945 3.945 0 0 1-1.163 1.413 5.114 5.114 0 0 1-1.683.807 7.135 7.135 0 0 1-1.928.259H0V4.084h6.947Zm-.235 12.9c.308.004.616-.029.916-.099a2.18 2.18 0 0 0 .766-.332c.228-.158.411-.371.534-.619.142-.317.208-.663.191-1.009a2.08 2.08 0 0 0-.642-1.715 2.618 2.618 0 0 0-1.696-.505h-3.54v4.279h3.471Zm13.635-5.967a2.13 2.13 0 0 0-1.654-.619 2.336 2.336 0 0 0-1.163.259 2.474 2.474 0 0 0-.738.62 2.359 2.359 0 0 0-.396.792c-.074.239-.12.485-.137.734h4.769a3.239 3.239 0 0 0-.679-1.785l-.002-.001Zm-13.813-.648a2.254 2.254 0 0 0 1.423-.433c.399-.355.607-.88.56-1.413a1.916 1.916 0 0 0-.178-.891 1.298 1.298 0 0 0-.495-.533 1.851 1.851 0 0 0-.711-.274 3.966 3.966 0 0 0-.835-.073H3.241v3.631h3.293v-.014ZM21.62 5.122h-5.976v1.527h5.976V5.122Z" />
+                        </svg>
+                        <span>Behance</span>
+                    </a>
+                </nav>
+
+            </div>
+
+            <!-- Baris bawah: copyright -->
+            <div class="site-footer__bottom">
+                <p class="site-footer__copyright">
+                    &copy; <span id="footerYear">2026</span> Al Furqon. All rights reserved
+                </p>
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- ============================================================
+       SCRIPT BRANDS — duplikat grup logo supaya marquee loop tanpa jeda.
+       Tidak perlu diubah saat mengganti atau menambah logo.
+       ============================================================ -->
+    <script>
+        (function () {
+            var track = document.getElementById("brandsTrack");
+            if (!track) return;
+
+            var group = track.querySelector(".brands__group");
+            if (!group) return;
+
+            var clone = group.cloneNode(true);
+            clone.setAttribute("aria-hidden", "true");
+            track.appendChild(clone);
+            track.classList.add("is-ready");
+        })();
+    </script>
+
+    <!-- ============================================================
+       SCRIPT OPSIONAL — animasi muncul saat elemen masuk viewport.
+       Hapus blok <script> ini jika tidak diperlukan.
+       ============================================================ -->
+    <script>
+        const revealItems = document.querySelectorAll(".reveal");
+
+        if ("IntersectionObserver" in window) {
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add("is-visible");
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                },
+                { threshold: 0, rootMargin: "0px 0px 80px 0px" }
+            );
+
+            revealItems.forEach((item) => observer.observe(item));
+        } else {
+            // Fallback untuk browser lama
+            revealItems.forEach((item) => item.classList.add("is-visible"));
+        }
+    </script>
+
+    <!-- ============================================================
+       SCRIPT FOOTER (TAMBAHAN) — tahun copyright otomatis.
+       Jika ingin tahun statis, hapus blok ini lalu tulis manual.
+       ============================================================ -->
+    <script>
+        (function () {
+            var yearEl = document.getElementById("footerYear");
+            if (yearEl) {
+                yearEl.textContent = new Date().getFullYear();
+            }
+        })();
+    </script>
+
+</body>
+
+</html>
